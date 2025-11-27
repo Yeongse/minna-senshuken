@@ -1,0 +1,40 @@
+{
+  "name": "minna-senshuken-backend",
+  "version": "1.0.0",
+  "description": "みんなの選手権 Backend API",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.7.0",
+    "@hono/zod-validator": "^0.2.2",
+    "@prisma/adapter-mariadb": "^6.9.0",
+    "@prisma/client": "^6.9.0",
+    "firebase-admin": "^12.7.0",
+    "hono": "^4.6.10",
+    "mariadb": "^3.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "prisma": "^6.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
