@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String   @unique @map("firebase_uid")
+  displayName String   @map("display_name") @db.VarChar(30)
+  avatarUrl   String?  @map("avatar_url")
+  bio         String?  @db.VarChar(200)
+  twitterUrl  String?  @map("twitter_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  championships Championship[]
+  answers       Answer[]
+  likes         Like[]
+  comments      Comment[]
+
+  @@map("users")
+}
+
+model Championship {
+  id             String             @id @default(uuid())
+  userId         String             @map("user_id")
+  title          String             @db.VarChar(50)
+  description    String             @db.VarChar(500)
+  status         ChampionshipStatus @default(RECRUITING)
+  startAt        DateTime           @default(now()) @map("start_at")
+  endAt          DateTime           @map("end_at")
+  summaryComment String?            @map("summary_comment") @db.VarChar(1000)
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id])
+  answers Answer[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([endAt])
+  @@map("championships")
+}
+
+enum ChampionshipStatus {
+  RECRUITING @map("recruiting")
+  SELECTING  @map("selecting")
+  ANNOUNCED  @map("announced")
+}
+
+model Answer {
+  id             String     @id @default(uuid())
+  championshipId String     @map("championship_id")
+  userId         String     @map("user_id")
+  text           String     @db.VarChar(300)
+  imageUrl       String?    @map("image_url")
+  awardType      AwardType? @map("award_type")
+  awardComment   String?    @map("award_comment") @db.VarChar(300)
+  likeCount      Int        @default(0) @map("like_count")
+  commentCount   Int        @default(0) @map("comment_count")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  championship Championship @relation(fields: [championshipId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  likes        Like[]
+  comments     Comment[]
+
+  @@index([championshipId])
+  @@index([userId])
+  @@map("answers")
+}
+
+enum AwardType {
+  GRAND_PRIZE   @map("grand_prize")
+  PRIZE         @map("prize")
+  SPECIAL_PRIZE @map("special_prize")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  answerId  String   @map("answer_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  answer Answer @relation(fields: [answerId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([answerId, userId])
+  @@index([answerId])
+  @@index([userId])
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  answerId  String   @map("answer_id")
+  userId    String   @map("user_id")
+  text      String   @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  answer Answer @relation(fields: [answerId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([answerId])
+  @@index([userId])
+  @@map("comments")
+}
