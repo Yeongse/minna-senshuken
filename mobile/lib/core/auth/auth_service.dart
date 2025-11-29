@@ -15,6 +15,12 @@ abstract class AuthServiceInterface {
   /// [forceRefresh]がtrueの場合、強制リフレッシュ
   Future<String?> getIdToken({bool forceRefresh = false});
 
+  /// メール/パスワードでサインイン
+  Future<UserCredential> signInWithEmailAndPassword(
+    String email,
+    String password,
+  );
+
   /// ログアウト
   Future<void> signOut();
 }
@@ -42,6 +48,17 @@ class AuthService implements AuthServiceInterface {
       return null;
     }
     return user.getIdToken(forceRefresh);
+  }
+
+  @override
+  Future<UserCredential> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    return _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   @override

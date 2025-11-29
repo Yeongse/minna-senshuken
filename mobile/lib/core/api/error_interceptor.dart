@@ -80,23 +80,27 @@ class ErrorInterceptor extends Interceptor {
       }
     }
 
-    // TOKEN_EXPIREDエラー時のリトライ処理
-    if (statusCode == 401 && errorCode == 'TOKEN_EXPIRED') {
-      try {
-        // トークンを強制リフレッシュ
-        final newToken = await _authService.getIdToken(forceRefresh: true);
-        if (newToken != null) {
-          // 新しいトークンでリクエストを再試行
-          final options = err.requestOptions;
-          options.headers['Authorization'] = 'Bearer $newToken';
-          final retryResponse = await _dio.fetch(options);
-          handler.resolve(retryResponse);
-          return;
+    // 401エラー処理
+    if (statusCode == 401) {
+      // TOKEN_EXPIREDの場合はリトライを試みる
+      if (errorCode == 'TOKEN_EXPIRED') {
+        try {
+          // トークンを強制リフレッシュ
+          final newToken = await _authService.getIdToken(forceRefresh: true);
+          if (newToken != null) {
+            // 新しいトークンでリクエストを再試行
+            final options = err.requestOptions;
+            options.headers['Authorization'] = 'Bearer $newToken';
+            final retryResponse = await _dio.fetch(options);
+            handler.resolve(retryResponse);
+            return;
+          }
+        } catch (_) {
+          // リトライ失敗時は下でログアウト
         }
-      } catch (_) {
-        // リトライ失敗時はログアウト
-        await _authService.signOut();
       }
+      // 401エラーの場合は自動ログアウト（TOKEN_EXPIREDでリトライ失敗した場合も含む）
+      await _authService.signOut();
     }
 
     // ApiExceptionを生成

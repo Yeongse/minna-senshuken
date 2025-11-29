@@ -96,7 +96,7 @@ class ServerException extends ApiException {
   final int statusCode;
 
   ServerException({
-    this.message = 'サーバーエラーが発生しました',
+    this.message = 'サーバーエラーが発生しました。しばらくしてから再度お試しください',
     this.code,
     this.statusCode = 500,
   });
@@ -112,7 +112,7 @@ class NetworkException extends ApiException {
   int? get statusCode => null;
 
   NetworkException({
-    this.message = 'ネットワーク接続に失敗しました',
+    this.message = 'インターネット接続を確認してください',
   });
 }
 

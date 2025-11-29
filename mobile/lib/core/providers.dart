@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import 'api/auth_interceptor.dart';
 import 'api/error_interceptor.dart';
 import 'auth/auth_provider.dart';
 import 'services/answer_api.dart';
+import 'services/cache_service.dart';
 import 'services/championship_api.dart';
 import 'services/upload_service.dart';
 import 'services/user_api.dart';
@@ -89,4 +91,32 @@ final userApiProvider = Provider<UserApi>((ref) {
 final uploadServiceProvider = Provider<UploadService>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   return UploadService(apiClient: apiClient);
+});
+
+/// CacheServiceのProvider
+final cacheServiceProvider = Provider<CacheService>((ref) {
+  final storageService = ref.watch(storageServiceProvider);
+  return CacheService(storage: storageService);
+});
+
+/// Connectivityインスタンス（内部使用）
+final _connectivityProvider = Provider<Connectivity>((ref) {
+  return Connectivity();
+});
+
+/// ネットワーク接続状態を監視するStreamProvider
+final connectivityStreamProvider =
+    StreamProvider<ConnectivityResult>((ref) {
+  final connectivity = ref.watch(_connectivityProvider);
+  return connectivity.onConnectivityChanged;
+});
+
+/// 現在オンラインかどうかを返すProvider
+final isOnlineProvider = Provider<bool>((ref) {
+  final connectivityAsync = ref.watch(connectivityStreamProvider);
+  return connectivityAsync.when(
+    data: (result) => result != ConnectivityResult.none,
+    loading: () => true, // デフォルトはオンラインと仮定
+    error: (_, __) => true, // エラー時もオンラインと仮定
+  );
 });

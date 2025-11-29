@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_service.dart';
 
 /// AuthServiceのProvider
-final authServiceProvider = Provider<AuthService>((ref) {
+final authServiceProvider = Provider<AuthServiceInterface>((ref) {
   return AuthService();
 });
 

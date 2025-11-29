@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>回答やプロフィールに画像を添付するため、写真ライブラリへのアクセスが必要です</string>
+	<key>NSCameraUsageDescription</key>
+	<string>回答やプロフィールに画像を添付するため、カメラへのアクセスが必要です</string>
 </dict>
 </plist>
